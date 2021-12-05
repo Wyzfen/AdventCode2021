@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace AdventCode2019
+namespace AdventCode2021
 {
     [TestClass]
     public class Day4
@@ -65,7 +65,7 @@ namespace AdventCode2019
 
         public (IEnumerable<int> input, IEnumerable<Bingo> boards) ParseInput(string [] values)
         {
-            var input = Utils.FromString<int>(values[0], split:',');
+            var input = Utils.FromString<int>(values[0], split:",");
             int count = (values.Length - 1) / 6;
             var boards = new List<Bingo>();
 

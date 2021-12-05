@@ -6,28 +6,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AdventCode2019
+namespace AdventCode2021
 {
     public static class Utils
     {
         public static IEnumerable<T> FromFile<T>(string filename) =>
             File.ReadAllLines(filename, Encoding.UTF8).Select(s => ValueFromString<T>(s));
 
-        public static IEnumerable<(T, U)> FromFile<T, U>(string filename, char split = ' ') =>
+        public static IEnumerable<(T, U)> FromFile<T, U>(string filename, string split = " ") =>
             File.ReadAllLines(filename, Encoding.UTF8).Select(s => FromString<T, U>(s, split));
 
-        public static IEnumerable<T> FromString<T>(string str, char split = ' ') =>
+        public static IEnumerable<T> FromString<T>(string str, string split = " ") =>
            SplitClean(str, split).Select(s => ValueFromString<T>(s));
 
-        public static (T, U) FromString<T, U>(string mystring, char split = ' ')
+        public static (T, U) FromString<T, U>(string mystring, string split = " ")
         {
             var p = SplitClean(mystring, split);
             return (ValueFromString<T>(p[0]), ValueFromString<U>(p[1]));
         }
 
-        private static string[] SplitClean(string mystring, char split) => mystring.Trim().Split(split).Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+        private static string[] SplitClean(string mystring, string split = " ") => mystring.Trim().Split(new[] { split }, StringSplitOptions.RemoveEmptyEntries).ToArray();
 
-        public static (T, U, V) FromString<T, U, V>(string mystring, char split = ' ')
+        public static (T, U, V) FromString<T, U, V>(string mystring, string split = " ")
         {
             var p = SplitClean(mystring, split);
             return (ValueFromString<T>(p[0]), ValueFromString<U>(p[1]), ValueFromString<V>(p[2]));
@@ -253,4 +253,39 @@ namespace AdventCode2019
             }
         }
     }
+
+
+    [TypeConverter(typeof(Vector2))]
+    [System.Diagnostics.DebuggerDisplay("({X}, {Y})")]
+    public class Vector2 : TypeConverter
+    {
+        public int X, Y;
+
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) => sourceType == typeof(String);
+        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+        {
+            if (value is string str)
+            {
+                (int x, int y) = Utils.FromString<int, int>(str, ",");
+                return new Vector2 { X = x, Y = y };
+            }
+            return base.ConvertFrom(context, culture, value);
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Vector2 vector &&
+                   X == vector.X &&
+                   Y == vector.Y;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 1861411795;
+            hashCode = hashCode * -1521134295 + X.GetHashCode();
+            hashCode = hashCode * -1521134295 + Y.GetHashCode();
+            return hashCode;
+        }
+    }
+
 }
