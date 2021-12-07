@@ -14,7 +14,7 @@ namespace AdventCode2021
         };
 
         readonly static string day = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name.ToLower();
-        readonly IEnumerable<int> values = Utils.FromString<int>(Utils.FromFile<string>($"{day}.txt").First(), ",");
+        readonly IEnumerable<int> values = Utils.FromCSVFile<int>($"{day}.txt")[0];
 
         [TestMethod]
         public void Problem1()
@@ -43,7 +43,7 @@ namespace AdventCode2021
 
             long result = input.Sum();
 
-            Assert.AreEqual(result, 360761);
+            Assert.AreEqual(result, 1632779838045);
         }
     }
 }

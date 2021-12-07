@@ -55,6 +55,11 @@ namespace AdventCode2021
             input.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 
         // Returns an array of arrays from a CSV file
+        public static T[][] FromCSVFile<T>(string filename, string split=",") =>
+            File.ReadAllLines(filename, Encoding.UTF8).Select(s => FromString<T>(s, split).ToArray()).ToArray();
+
+
+        // Returns an array of arrays from a CSV file
         public static String[][] StringsFromCSVFile(string filename) =>
             File.ReadAllLines(filename, Encoding.UTF8).Select(s => s.Split(',')).ToArray();
 
