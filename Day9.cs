@@ -16,6 +16,8 @@ namespace AdventCode2021
             "8767896789",
             "9899965678"
         };
+        
+        public readonly record struct Vector2(int X, int Y);
 
         readonly static string day = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name.ToLower();
         readonly static IEnumerable<string> input = Utils.FromFile<string>($"{day}.txt");
@@ -24,7 +26,7 @@ namespace AdventCode2021
         [TestMethod]
         public void Problem1()
         {
-            int result = GetBasins().Sum(b => values[b.y][b.x] + 1);
+            int result = GetBasins().Sum(b => values[b.Y][b.X] + 1);
 
             Assert.AreEqual(result, 554);
         }
@@ -35,44 +37,34 @@ namespace AdventCode2021
             int height = values.Length;
             int width = values[0].Length;
 
-            int RecurseBasin(int x, int y, int previous, HashSet<(int x, int y)> set)
+            int RecurseBasin(Vector2 v, int previous, HashSet<Vector2> set)
             {
-                if (set.Contains((x, y))) return 0;
-                set.Add((x, y));
+                if (set.Contains(v)) return set.Count;
 
-                int value = values[y][x];
-                if (value == 9) return 0;
+                int value = values[v.Y][v.X];
+                if (value == 9) return set.Count;
 
-                int sum = 1;
+                set.Add(v);
+
                 if (previous < value)
                 {
-                    if (y > 0 && values[y - 1][x] > value) sum += RecurseBasin(x, y - 1, value, set);
-                    if (x > 0 && values[y][x - 1] > value) sum += RecurseBasin(x - 1, y, value, set);
-                    if (x < width - 1 && values[y][x + 1] > value) sum += RecurseBasin(x + 1, y, value, set);
-                    if (y < height - 1 && values[y + 1][x] > value) sum += RecurseBasin(x, y + 1, value, set);
+                    if (v.Y > 0 && values[v.Y - 1][v.X] > value) RecurseBasin(new Vector2(v.X, v.Y - 1), value, set);
+                    if (v.X > 0 && values[v.Y][v.X - 1] > value) RecurseBasin(new Vector2(v.X - 1, v.Y), value, set);
+                    if (v.X < width - 1 && values[v.Y][v.X + 1] > value) RecurseBasin(new Vector2(v.X + 1, v.Y), value, set);
+                    if (v.Y < height - 1 && values[v.Y + 1][v.X] > value) RecurseBasin(new Vector2(v.X, v.Y + 1), value, set);
                 }
 
-                return sum;
+                return set.Count;
             }
 
-            var basins = GetBasins().ToArray();
-            var sizes = new List<int>();
-            foreach(var (x, y) in basins)
-            {
-                var set = new HashSet<(int x, int y)>();
-                int count = RecurseBasin(x, y, -1, set);
-                sizes.Add(count);
-            }
-
-            sizes.Sort();
-            sizes.Reverse();
-
-            int result = sizes[0] * sizes[1] * sizes[2];
+            int result = GetBasins().Select(v => RecurseBasin(v, -1, new HashSet<Vector2>()))
+                                    .OrderByDescending(v => v)
+                                    .Take(3).Aggregate((a, b) => a * b);
 
             Assert.AreEqual(result, 1017792);
         }
 
-        public IEnumerable<(int x, int y)> GetBasins()
+        public IEnumerable<Vector2> GetBasins()
         {
             int height = values.Length;
             for (int y = 0; y < height; y++)
@@ -86,7 +78,7 @@ namespace AdventCode2021
                        (x == width - 1 || values[y][x + 1] > value) &&
                        (y == height - 1 || values[y + 1][x] > value))
                     {
-                        yield return (x, y);
+                        yield return new Vector2(x, y);
                     }
                 }
             }
