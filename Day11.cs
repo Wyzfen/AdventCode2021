@@ -121,7 +121,7 @@ namespace AdventCode2021
                 if (values.All(v => v == 0)) break;
             }
 
-            Assert.AreEqual(result, 1656);
+            Assert.AreEqual(result, 216);
         }
     }
 }
