@@ -33,7 +33,7 @@ namespace AdventCode2021
             return (ValueFromString<T>(p[0]), ValueFromString<U>(p[1]), ValueFromString<V>(p[2]));
         }
 
-        private static T ValueFromString<T>(string mystring)
+        public static T ValueFromString<T>(string mystring)
         {
             var foo = TypeDescriptor.GetConverter(typeof(T));
             return (T)(foo.ConvertFromInvariantString(mystring));
@@ -259,37 +259,20 @@ namespace AdventCode2021
         }
     }
 
+    [TypeConverter(typeof(Vector2Converter))]
+    public record struct Vector2(int X, int Y);
 
-    [TypeConverter(typeof(Vector2))]
-    [System.Diagnostics.DebuggerDisplay("({X}, {Y})")]
-    public class Vector2 : TypeConverter
-    {
-        public int X, Y;
-
+    public class Vector2Converter : TypeConverter
+    { 
         public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) => sourceType == typeof(String);
         public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
         {
             if (value is string str)
             {
                 (int x, int y) = Utils.FromString<int, int>(str, ",");
-                return new Vector2 { X = x, Y = y };
+                return new Vector2(x, y);
             }
             return base.ConvertFrom(context, culture, value);
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Vector2 vector &&
-                   X == vector.X &&
-                   Y == vector.Y;
-        }
-
-        public override int GetHashCode()
-        {
-            int hashCode = 1861411795;
-            hashCode = hashCode * -1521134295 + X.GetHashCode();
-            hashCode = hashCode * -1521134295 + Y.GetHashCode();
-            return hashCode;
         }
     }
 
